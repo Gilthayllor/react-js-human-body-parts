@@ -1,54 +1,127 @@
-# React + TypeScript + Vite
+# react-js-human-body-parts
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Aplicação web interativa desenvolvida com React e TypeScript para visualização e seleção de partes do corpo humano.
 
-Currently, two official plugins are available:
+> **Baseado em:** [darshan260802/human-body-react](https://github.com/darshan260802/human-body-react)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Visão Geral
 
-## Expanding the ESLint configuration
+O **react-js-human-body-parts** permite a seleção de partes do corpo em aplicações médicas. O objetivo inicial por trás do projeto é permitir que o usuário selecione partes do corpo que sofreram lesões em um acidente, por exemplo. A interface facilita a identificação visual e a marcação das regiões afetadas, tornando o componente útil em aplicações hospitalares e clínicas.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Funcionalidades Principais
 
-```js
-export default tseslint.config({
-  extends: [
-    // Remove ...tseslint.configs.recommended and replace with this
-    ...tseslint.configs.recommendedTypeChecked,
-    // Alternatively, use this for stricter rules
-    ...tseslint.configs.strictTypeChecked,
-    // Optionally, add this for stylistic rules
-    ...tseslint.configs.stylisticTypeChecked,
-  ],
-  languageOptions: {
-    // other options...
-    parserOptions: {
-      project: ['./tsconfig.node.json', './tsconfig.app.json'],
-      tsconfigRootDir: import.meta.dirname,
+- **Visualização Interativa:** Explore partes do corpo humano em uma interface moderna e responsiva.
+- **Slugs Únicos para Identificação:** Cada parte do corpo é identificada internamente por um _slug_ único (exemplo: `pe_dir_frente`, `perna_esq_costas`), facilitando a manipulação via código. Os _slugs_ podem ser customizados conforme a necessidade.
+
+## Como Funciona a Customização
+
+O sistema utiliza _slugs_ (identificadores únicos, como `pe_dir_frente`, `perna_esq_costas`, `genital`, etc.) para mapear cada parte do corpo. Os slugs são definidos em `./types/slug.ts`.
+O tipo `BodyPart` define o _slug_ e o `path` svg da parte do corpo.
+Cada `<path>` que compõe as partes do corpo é atribuída a um _Slug_ através dos arquivos bodyFront.ts e bodyBack.ts
+
+**`slug.ts`**
+```ts
+export type Slug = 
+"pe_esq_frente" | "pe_dir_frente" |
+"perna_esq_frente" | "perna_dir_frente" |
+"joelho_esq_frente" | "joelho_dir_frente" |
+```
+
+**`bodyPart.ts`**
+```ts
+export interface BodyPart {
+    path?: string;
+    slug: Slug;
+}
+```
+
+**`bodyFront.ts`**
+```ts
+export const backBody: BodyPart[] = [
+    {
+        slug: "pe_esq_costas",
+        path: "m ..."
     },
-  },
-})
+    {
+        slug: "pe_dir_costas",
+        path: "m ..."
+    },
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+**Exemplo de uso:**
+```tsx
+import { useCallback, useState } from 'react';
+import './App.css'
+import { Body } from './components/body/Body'
+import type { Slug } from './components/body/types/slug';
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+function App() {
+  const [selectedParts, setSelectedParts] = useState<Slug[]>([]);
 
-export default tseslint.config({
-  plugins: {
-    // Add the react-x and react-dom plugins
-    'react-x': reactX,
-    'react-dom': reactDom,
-  },
-  rules: {
-    // other rules...
-    // Enable its recommended typescript rules
-    ...reactX.configs['recommended-typescript'].rules,
-    ...reactDom.configs.recommended.rules,
-  },
-})
+  const handlePartClick = useCallback((part: Slug) => {
+    setSelectedParts((prevSelectedParts) => {
+      if (prevSelectedParts.includes(part)) {
+        return prevSelectedParts.filter((p) => p !== part);
+      } else {
+        return [...prevSelectedParts, part];
+      }
+    });
+  }, []);
+
+  const scale = 1.3;
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "20px" }}>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "20px" }}>
+        <Body side='front' selectedParts={selectedParts} scale={scale} onPartClick={handlePartClick} />
+        <Body side='back' selectedParts={selectedParts} scale={scale} onPartClick={handlePartClick} />
+      </div>
+      <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "4px", maxWidth: "400px" }}>
+        <span>
+          Partes selecionadas:
+        </span>
+        {selectedParts.map((part) => (
+          <span key={part} style={{ padding: "4px", border: "1px solid black", borderRadius: "4px" }}>
+            {part}
+          </span>
+        ))}
+      </div>
+    </div>
+  )
+}
+
+export default App
 ```
+
+<img src="./files/app_screenshot.png">
+
+## Instalação
+
+```bash
+git clone https://github.com/Gilthayllor/react-js-human-body-parts.git
+cd react-js-human-body-parts
+npm install
+# ou
+yarn install
+```
+
+## Execução
+```bash
+npm run dev
+```
+A aplicação será iniciada em http://localhost:5173
+
+## Créditos
+
+Esta aplicação foi baseada e inspirada no projeto [darshan260802/human-body-react](https://github.com/darshan260802/human-body-react).
+
+## Contribuição
+
+Contribuições são bem-vindas! Sinta-se à vontade para abrir issues, sugerir melhorias ou enviar pull requests.
+
+## Licença
+
+Este projeto está sob a licença MIT. Veja o arquivo [LICENSE](LICENSE) para mais detalhes.
+
+---
+
+_Feito com ❤️ por [Gilthayllor](https://github.com/Gilthayllor)_
