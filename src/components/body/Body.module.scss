@@ -1,0 +1,21 @@
+.bodyPartSelected {
+    fill: #ff4d4f;
+    opacity: 0.9;
+    transition: opacity 0.15s ease;
+}
+
+.bodyPartSelected:hover {
+    cursor: pointer;
+}
+
+.bodyPart {
+    fill: #ff4d4f;
+    opacity: 0;
+    transition: opacity 0.1s;
+    stroke: none;
+}
+
+.bodyPart:hover {
+    opacity: 0.5;
+    cursor: pointer;
+}
